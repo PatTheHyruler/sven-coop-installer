@@ -1,2 +1,2 @@
-# sven-coop-installer
+# Sven Co-op map installer
 epic gamer program
