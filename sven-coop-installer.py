@@ -65,7 +65,7 @@ else:
     steampath = get_steam_path()
     path = get_game_path(steampath)
 
-sven_dst = f"{path}\\svencoop_addon"
+sven_dst = f"{path}svencoop_addon"
 
 # Creating svencoop_addon in path if it doesn't exist there yet
 try:
@@ -80,10 +80,26 @@ except FileExistsError:
 def install(temp, iteration):
     iteration += 1
     if os.path.isdir(temp+"\\maps"):
-        for f in os.listdir(temp):
-            if os.path.exists(f"{sven_dst}\\{f}"):
-                shutil.rmtree(f"{sven_dst}\\{f}")
-            shutil.move(f"{temp}\\{f}", sven_dst)
+        # walk keeps track of what cycle we're in in the following for loop
+        walk = -1
+        for root, dirs, files in os.walk(temp):
+            walk+=1
+            if root==temp:
+                pass
+            else:
+                try:
+                    os.makedirs(root.replace(temp, sven_dst))
+                except FileExistsError:
+                    pass
+
+            for item in files:
+                if walk == 0:
+                    shutil.copy(f"{temp}\\{item}", sven_dst)
+                else:
+                    src = os.path.join(root, item)
+                    dst = src.replace(temp, sven_dst)
+                    shutil.copy(src, dst)
+
     elif iteration <= maxiter:
         for f in os.listdir(temp):
                 try:
@@ -93,10 +109,8 @@ def install(temp, iteration):
     else:
         return
 
-
 # Creating a temporary folder to store extracted files in
 temp = tempfile.TemporaryDirectory(None,"sven co-op map installer.",tempfile.gettempdir()).name
-
 
 # Checking if the target file is a zip file
 # if it is, extracting its contents to the temp folder and running the install function
