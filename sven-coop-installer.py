@@ -7,6 +7,8 @@ import winreg
 from zipfile import ZipFile
 import argparse
 import ast
+#required for os detection
+import platform
 
 
 
@@ -14,7 +16,7 @@ import ast
 parser = argparse.ArgumentParser()
 
 parser.add_argument("file", help="path to the zip file that you want to install", type=str)
-parser.add_argument("-sp", "--svenpath", help="path to the directory where Sven Co-op is installed\nshould end with something like ...steamapps\\common\\Sven Co-op", type=str)
+parser.add_argument("-sp", "--svenpath", help="path to the directory where Sven Co-op is installed.\n Should end with something like ...steamapps\\common\\Sven Co-op", type=str)
 parser.add_argument("-i", "--iterations", help="how many iterations (of checking target file for necessary structure) to perform before quitting", type=int)
 
 args = parser.parse_args()
@@ -30,16 +32,20 @@ else:
 
 
 
-#function made by Rebane2001
+#function mostly made by Rebane2001
 def get_steam_path():
-    """Get Steam install location from the Windows registry"""
-    try:
-        key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
-                             "SOFTWARE\\WOW6432Node\\Valve\\Steam")
-        value = winreg.QueryValueEx(key, "InstallPath")[0]
-        return value
-    except:
-        raise Exception("Couldn't locate Steam")
+    
+    if platform.system() == "Windows":
+        """Get Steam install location from the Windows registry"""
+        try:
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                "SOFTWARE\\WOW6432Node\\Valve\\Steam")
+            value = winreg.QueryValueEx(key, "InstallPath")[0]
+            return value
+        except:
+            raise Exception("Couldn't locate Steam")
+    elif platform.system() == "Linux":
+        print("Automatic sven location detection not supported on Linux, sorry.")
 
 #function mostly made by Rebane2001
 def get_game_path(steampath):
