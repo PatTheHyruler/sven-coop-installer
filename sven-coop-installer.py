@@ -15,7 +15,7 @@ import platform
 # Adding command line arguments with argparse
 parser = argparse.ArgumentParser()
 
-parser.add_argument("file", help="path to the zip file that you want to install", type=str)
+parser.add_argument("file", help="path to the zip file that you want to install", type=str, nargs='+')
 parser.add_argument("-sp", "--svenpath", help="path to the directory where Sven Co-op is installed.\n Should end with something like ...steamapps\\common\\Sven Co-op", type=str)
 parser.add_argument("-i", "--iterations", help="how many iterations (of checking target file for necessary structure) to perform before quitting", type=int)
 
@@ -120,15 +120,16 @@ temp = tempfile.TemporaryDirectory(None,"sven co-op map installer.",tempfile.get
 
 # Checking if the target file is a zip file
 # if it is, extracting its contents to the temp folder and running the install function
-try:    
-    if re.match(r".+\.zip$", args.file, re.IGNORECASE):
-        zip = ZipFile(args.file, "r")
-        zip.extractall(temp)
-        install(temp, 0)
-    else:
-        input("Expected a .zip file as input")
-except:
-    raise
-finally:
-    # Deleting the temp folder (not sure if this is even needed)
-    shutil.rmtree(temp)
+for file in args.file:
+    try:    
+        if re.match(r".+\.zip$", file, re.IGNORECASE):
+            zip = ZipFile(file, "r")
+            zip.extractall(temp)
+            install(temp, 0)
+        else:
+            input("Expected a .zip file as input")
+    except:
+        raise
+    finally:
+        # Deleting the temp folder (not sure if this is even needed)
+        shutil.rmtree(temp)
