@@ -49,7 +49,7 @@ def get_steam_path():
             value = winreg.QueryValueEx(key, "InstallPath")[0]
             return value
         except:
-            raise Exception("Couldn't locate Steam")
+            input("Couldn't locate Steam. Press Enter to quit.")
     elif platform.system() == "Linux":
         print("Automatic sven location detection not supported on Linux, sorry.")
 
@@ -68,7 +68,7 @@ def get_game_path(steampath):
                 return f"{gamepath}\\steamapps\\common\\Sven Co-op\\"
         raise Exception("Couldn't locate Sven Co-op")
     except:
-        raise Exception("Couldn't locate Sven Co-op")
+        input("Couldn't locate Sven Co-op. Press Enter to quit.")
 
 
 if args.svenpath:
@@ -138,10 +138,9 @@ for file in args.file:
             archive = rarfile.RarFile(file)
         else:
             archive = False
-            print("Unsupported input archive. Continuing.")
-        if archive:
-            archive.extractall(temp)
-            install(temp, 0)
+            raise Exception("Unsupported input archive.")
+        archive.extractall(temp)
+        install(temp, 0)
     except:
         print(f"Failed on {file}.\nTrying next file / quitting if no other files given.")
     finally:
