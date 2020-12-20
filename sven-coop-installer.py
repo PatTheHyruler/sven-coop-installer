@@ -91,7 +91,7 @@ except FileExistsError:
 # temp = current directory that the function is operating in
 def install(temp, iteration):
     iteration += 1
-    if os.path.isdir(temp+"\\maps"):
+    if os.path.isdir(temp+"\\maps") or os.path.isdir(temp+"\\models"):
         # walk keeps track of what cycle we're in in the following for loop
         walk = -1
         for root, dirs, files in os.walk(temp):
