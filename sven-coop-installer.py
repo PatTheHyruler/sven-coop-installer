@@ -138,7 +138,7 @@ for file in args.file:
             archive = rarfile.RarFile(file)
         else:
             archive = False
-            input("Unsupported input archive. Continue?")
+            print("Unsupported input archive. Continuing.")
         if archive:
             archive.extractall(temp)
             install(temp, 0)
