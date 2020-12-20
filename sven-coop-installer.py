@@ -4,18 +4,24 @@ import shutil
 import sys
 import tempfile
 import winreg
-from zipfile import ZipFile
 import argparse
 import ast
 #required for os detection
 import platform
+
+# Archive support
+import zipfile
+import tarfile
+# NOT INCLUDED IN STANDARD PYTHON LIBRARY:
+import py7zr
+import rarfile
 
 
 
 # Adding command line arguments with argparse
 parser = argparse.ArgumentParser()
 
-parser.add_argument("file", help="path to the zip file that you want to install", type=str, nargs='+')
+parser.add_argument("file", help="path to the archive (probably .zip) file(s) that you want to install", type=str, nargs='+')
 parser.add_argument("-sp", "--svenpath", help="path to the directory where Sven Co-op is installed.\n Should end with something like ...steamapps\\common\\Sven Co-op", type=str)
 parser.add_argument("-i", "--iterations", help="how many iterations (of checking target file for necessary structure) to perform before quitting", type=int)
 
@@ -118,18 +124,26 @@ def install(temp, iteration):
 # Creating a temporary folder to store extracted files in
 temp = tempfile.TemporaryDirectory(None,"sven co-op map installer.",tempfile.gettempdir()).name
 
-# Checking if the target file is a zip file
+# Checking if the target file is a valid input archive
 # if it is, extracting its contents to the temp folder and running the install function
 for file in args.file:
     try:    
-        if re.match(r".+\.zip$", file, re.IGNORECASE):
-            zip = ZipFile(file, "r")
-            zip.extractall(temp)
-            install(temp, 0)
+        if zipfile.is_zipfile(file):
+            archive = zipfile.ZipFile(file)
+        elif re.match(r".+\.7z$", file, re.IGNORECASE):
+            archive = py7zr.SevenZipFile(file)
+        elif tarfile.is_tarfile(file):
+            archive = tarfile.open(file)
+        elif rarfile.is_rarfile(file):
+            archive = rarfile.RarFile(file)
         else:
-            input("Expected a .zip file as input")
+            archive = False
+            input("Unsupported input archive")
+        if archive:
+            archive.extractall(temp)
+            install(temp, 0)
     except:
         raise
     finally:
-        # Deleting the temp folder (not sure if this is even needed)
-        shutil.rmtree(temp)
+        if os.path.isdir(temp):
+            shutil.rmtree(temp)
