@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 # custom ignores
-testfile.*
-compileinstructions.*
+testfile*
+compileinstructions
