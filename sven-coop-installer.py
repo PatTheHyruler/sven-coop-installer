@@ -138,12 +138,12 @@ for file in args.file:
             archive = rarfile.RarFile(file)
         else:
             archive = False
-            input("Unsupported input archive")
+            input("Unsupported input archive. Continue?")
         if archive:
             archive.extractall(temp)
             install(temp, 0)
     except:
-        raise
+        print(f"Failed on {file}.\nTrying next file / quitting if no other files given.")
     finally:
         if os.path.isdir(temp):
             shutil.rmtree(temp)
